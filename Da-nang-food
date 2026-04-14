@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>峴港 × 會安 美食攻略</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --da-nang: #c0392b;
+    --hoi-an: #e67e22;
+    --coffee: #6f4e37;
+    --bread: #d4a017;
+    --viet: #27ae60;
+    --dessert: #8e44ad;
+    --pizza: #2980b9;
+    --buffet: #16a085;
+    --bg: #fdf6ec;
+    --card: #fff;
+    --text: #2c2c2c;
+    --muted: #777;
+    --border: #e8ddd0;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘Noto Sans TC’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+}
+
+header {
+background: linear-gradient(135deg, #1a0a00 0%, #3d1a00 50%, #1a0a00 100%);
+padding: 36px 24px 28px;
+text-align: center;
+position: relative;
+overflow: hidden;
+}
+header::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 40px);
+}
+header h1 {
+font-family: ‘Playfair Display’, serif;
+color: #f5c842;
+font-size: clamp(22px, 5vw, 38px);
+letter-spacing: 2px;
+position: relative;
+}
+header p {
+color: rgba(255,220,150,0.7);
+font-size: 13px;
+margin-top: 6px;
+position: relative;
+letter-spacing: 1px;
+}
+
+.controls {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+padding: 16px 16px 8px;
+justify-content: center;
+background: #fff;
+border-bottom: 1px solid var(–border);
+position: sticky;
+top: 0;
+z-index: 10;
+box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.filter-btn {
+border: 1.5px solid var(–border);
+background: #fff;
+padding: 5px 14px;
+border-radius: 20px;
+font-size: 12px;
+cursor: pointer;
+font-family: ‘Noto Sans TC’, sans-serif;
+color: var(–muted);
+transition: all 0.2s;
+white-space: nowrap;
+}
+.filter-btn:hover { border-color: #c0392b; color: #c0392b; }
+.filter-btn.active { background: #c0392b; border-color: #c0392b; color: #fff; }
+.filter-btn.loc-hoi { –a: var(–hoi-an); }
+.filter-btn.loc-hoi.active { background: var(–hoi-an); border-color: var(–hoi-an); }
+.filter-btn.loc-da.active { background: var(–da-nang); border-color: var(–da-nang); }
+
+.table-wrap {
+overflow-x: auto;
+padding: 16px;
+}
+
+table {
+width: 100%;
+min-width: 700px;
+border-collapse: separate;
+border-spacing: 0;
+background: #fff;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+
+thead tr {
+background: linear-gradient(90deg, #2c1500, #4a2000);
+}
+thead th {
+color: #f5c842;
+font-size: 12px;
+font-weight: 500;
+letter-spacing: 1px;
+padding: 12px 14px;
+text-align: left;
+white-space: nowrap;
+}
+
+tbody tr {
+border-bottom: 1px solid var(–border);
+transition: background 0.15s;
+}
+tbody tr:hover { background: #fdf0e0; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr.hidden { display: none; }
+
+td {
+padding: 11px 14px;
+font-size: 13px;
+vertical-align: middle;
+line-height: 1.5;
+}
+
+.num {
+color: var(–muted);
+font-size: 11px;
+width: 28px;
+text-align: center;
+}
+
+.name-cell {
+font-weight: 500;
+min-width: 160px;
+max-width: 220px;
+}
+
+.loc-badge {
+display: inline-block;
+padding: 2px 9px;
+border-radius: 12px;
+font-size: 11px;
+font-weight: 500;
+white-space: nowrap;
+}
+.loc-da { background: #fde8e6; color: var(–da-nang); }
+.loc-hoi { background: #fef0e0; color: var(–hoi-an); }
+
+.cat-badge {
+display: inline-block;
+padding: 2px 9px;
+border-radius: 12px;
+font-size: 11px;
+white-space: nowrap;
+}
+.cat-bread { background: #fef9e7; color: #b7950b; border: 1px solid #f9e79f; }
+.cat-viet { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+.cat-coffee { background: #f5eee6; color: var(–coffee); border: 1px solid #d5c2ae; }
+.cat-dessert { background: #f5eef8; color: var(–dessert); border: 1px solid #d7bde2; }
+.cat-pizza { background: #eaf4fd; color: var(–pizza); border: 1px solid #aed6f1; }
+.cat-buffet { background: #e8f8f5; color: var(–buffet); border: 1px solid #a2d9ce; }
+.cat-pho { background: #fef5e7; color: #ca6f1e; border: 1px solid #f8c471; }
+
+.hours { font-size: 12px; color: #555; white-space: nowrap; }
+
+.book-yes { color: #c0392b; font-weight: 500; font-size: 12px; }
+.book-no { color: #27ae60; font-size: 12px; }
+.book-rec { color: #e67e22; font-size: 12px; }
+.book-na { color: #bbb; font-size: 12px; }
+
+.note-cell { font-size: 12px; color: #555; max-width: 240px; line-height: 1.6; }
+
+.star { color: #e74c3c; font-size: 11px; margin-left: 3px; }
+
+.legend {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+padding: 12px 16px;
+font-size: 11px;
+color: var(–muted);
+justify-content: center;
+}
+.legend span { display: flex; align-items: center; gap: 4px; }
+
+.copy-btn {
+display: block;
+margin: 0 auto 20px;
+padding: 9px 24px;
+background: #2c1500;
+color: #f5c842;
+border: none;
+border-radius: 20px;
+font-family: ‘Noto Sans TC’, sans-serif;
+font-size: 13px;
+cursor: pointer;
+letter-spacing: 1px;
+transition: background 0.2s;
+}
+.copy-btn:hover { background: #4a2000; }
+
+.count-label {
+text-align: center;
+font-size: 12px;
+color: var(–muted);
+padding: 4px 0 8px;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <h1>🇻🇳 峴港 × 會安 美食攻略</h1>
+  <p>Da Nang &amp; Hoi An · 23 間精選餐廳 &amp; 咖啡廳</p>
+</header>
+
+<div class="controls">
+  <button class="filter-btn active" data-filter="all">全部 (23)</button>
+  <button class="filter-btn loc-da" data-filter="da">🏙 峴港</button>
+  <button class="filter-btn loc-hoi" data-filter="hoi">🏮 會安</button>
+  <button class="filter-btn" data-filter="bread">🥖 法國麵包</button>
+  <button class="filter-btn" data-filter="viet">🍚 越南料理</button>
+  <button class="filter-btn" data-filter="coffee">☕ 咖啡廳</button>
+  <button class="filter-btn" data-filter="dessert">🍧 甜點</button>
+  <button class="filter-btn" data-filter="michelin">⭐ 米其林</button>
+</div>
+
+<div class="count-label" id="count-label">顯示 23 筆</div>
+
+<div class="table-wrap">
+<table id="main-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>餐廳名稱</th>
+      <th>地區</th>
+      <th>類別</th>
+      <th>營業時間</th>
+      <th>訂位</th>
+      <th>備註</th>
+    </tr>
+  </thead>
+  <tbody>
+
+```
+<tr data-loc="da" data-cat="bread">
+  <td class="num">1</td>
+  <td class="name-cell">Bánh Mì Happy Bread Mì AA</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-bread">🥖 法國麵包</span></td>
+  <td class="hours">約 06:00–14:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">靠近韓市場，早上去較新鮮</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="viet">
+  <td class="num">2</td>
+  <td class="name-cell">Cơm Linh Vietnamese Restaurant</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-viet">🍚 越南料理</span></td>
+  <td class="hours">約 10:00–21:00</td>
+  <td class="book-rec">建議訂位</td>
+  <td class="note-cell">會安必吃，脆皮烤鴨、廣樓麵超推</td>
+</tr>
+
+<tr data-loc="da" data-cat="pho">
+  <td class="num">3</td>
+  <td class="name-cell">Cô Ba Phở bò</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-pho">🍜 河粉/蛋煎餅</span></td>
+  <td class="hours">約 06:00–14:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">河粉 + 蛋煎餅，早午餐首選</td>
+</tr>
+
+<tr data-loc="da" data-cat="viet" data-michelin="1">
+  <td class="num">4</td>
+  <td class="name-cell">Thìa Gỗ Đà Nẵng</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-viet">🍚 越南料理</span></td>
+  <td class="hours">約 10:00–22:00</td>
+  <td class="book-yes">建議提前訂<span class="star">必比登⭐</span></td>
+  <td class="note-cell">美溪沙灘附近，米其林必比登推薦</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="viet" data-michelin="1">
+  <td class="num">5</td>
+  <td class="name-cell">Morning Glory Original</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-viet">🍚 越南料理</span></td>
+  <td class="hours">約 11:00–22:00</td>
+  <td class="book-yes">強烈建議<span class="star">知名餐廳⭐</span></td>
+  <td class="note-cell">會安老字號名店，人氣很旺需早訂</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="bread">
+  <td class="num">6</td>
+  <td class="name-cell">Madam Khánh - The Bánh Mì Queen</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-bread">🥖 法國麵包</span></td>
+  <td class="hours">約 06:30–19:00</td>
+  <td class="book-no">不需要，現排</td>
+  <td class="note-cell">當地人最愛，比 Phượng 更在地，早去避免售完</td>
+</tr>
+
+<tr data-loc="da" data-cat="viet" data-michelin="1">
+  <td class="num">7</td>
+  <td class="name-cell">Ăn Thôi</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-viet">🍚 越南料理</span></td>
+  <td class="hours">約 17:00–22:00</td>
+  <td class="book-no">不需要，現排<span class="star">米其林⭐</span></td>
+  <td class="note-cell">韓市場旁，米其林推薦；建議先做奧黛再去排隊</td>
+</tr>
+
+<tr data-loc="da" data-cat="pizza">
+  <td class="num">8</td>
+  <td class="name-cell">Pizza 4P's Indochina Đà Nẵng</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-pizza">🍕 披薩</span></td>
+  <td class="hours">約 11:00–22:00</td>
+  <td class="book-yes">強烈建議</td>
+  <td class="note-cell">越南連鎖知名披薩，自製起司，人多需提前訂</td>
+</tr>
+
+<tr data-loc="da" data-cat="coffee">
+  <td class="num">9</td>
+  <td class="name-cell">Trình Cà Phê</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 07:00–21:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">主打酪梨系列飲品，特色健康風</td>
+</tr>
+
+<tr data-loc="da" data-cat="coffee">
+  <td class="num">10</td>
+  <td class="name-cell">Cộng Cà Phê</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 07:00–23:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">招牌椰子咖啡，越南連鎖，復古軍風佈置</td>
+</tr>
+
+<tr data-loc="da" data-cat="bread">
+  <td class="num">12</td>
+  <td class="name-cell">Banh Mi & Coffee NHÀ VIỆT</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-bread">🥖 法國麵包</span></td>
+  <td class="hours">約 06:00–20:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">峴港必吃越南麵包，韓國觀光客也愛排</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="dessert">
+  <td class="num">13</td>
+  <td class="name-cell">Hoi An Ubebe</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-dessert">🍧 甜點</span></td>
+  <td class="hours">約 09:00–21:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">會安網紅甜點店，主打芒果冰沙，打卡熱點</td>
+</tr>
+
+<tr data-loc="da" data-cat="bread">
+  <td class="num">14</td>
+  <td class="name-cell">Heo Nướng Lu Ông Phú Đạt</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-bread">🥖 法國麵包</span></td>
+  <td class="hours">約 06:00–18:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">烤豬夾法國麵包，在地庶民小吃</td>
+</tr>
+
+<tr data-loc="da" data-cat="coffee">
+  <td class="num">15</td>
+  <td class="name-cell">Highlands Coffee</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 07:00–22:30</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">越南版星巴克，連鎖穩定，適合休息補給</td>
+</tr>
+
+<tr data-loc="da" data-cat="viet">
+  <td class="num">16</td>
+  <td class="name-cell">Nhà Bếp Xưa Restaurant</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-viet">🍚 越南料理</span></td>
+  <td class="hours">約 10:00–21:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">好吃又便宜，春捲必點</td>
+</tr>
+
+<tr data-loc="da" data-cat="coffee">
+  <td class="num">17</td>
+  <td class="name-cell">Uncle Huan Coffee</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 07:30–21:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">越南蛋咖啡，適合拍照打卡，建議點少糖</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="coffee">
+  <td class="num">18</td>
+  <td class="name-cell">Moments Hoi An</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 08:00–22:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">會安椰子咖啡，環境美適合拍照</td>
+</tr>
+
+<tr data-loc="da" data-cat="coffee">
+  <td class="num">19</td>
+  <td class="name-cell">Cửa Ngõ Café</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 07:00–22:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">峴港椰子咖啡，摩洛哥造景打卡牆超好拍</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="coffee">
+  <td class="num">20</td>
+  <td class="name-cell">92 Station Restaurant & Café</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 08:00–22:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">會安古城少數高樓層咖啡廳，俯瞰景觀絕佳</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="coffee">
+  <td class="num">21</td>
+  <td class="name-cell">Faifo Coffee</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-coffee">☕ 咖啡廳</span></td>
+  <td class="hours">約 07:00–22:00</td>
+  <td class="book-no">不需要</td>
+  <td class="note-cell">同 92 Station，高樓層視野，適合拍古城全景</td>
+</tr>
+
+<tr data-loc="hoi" data-cat="bread">
+  <td class="num">22</td>
+  <td class="name-cell">Bánh Mì Phượng</td>
+  <td><span class="loc-badge loc-hoi">會安</span></td>
+  <td><span class="cat-badge cat-bread">🥖 法國麵包</span></td>
+  <td class="hours">約 06:30–21:30</td>
+  <td class="book-no">不需要，現排</td>
+  <td class="note-cell">會安最知名觀光麵包店，曾獲 Anthony Bourdain 推薦</td>
+</tr>
+
+<tr data-loc="da" data-cat="buffet">
+  <td class="num">23</td>
+  <td class="name-cell">All Seasons Buffet Da Nang</td>
+  <td><span class="loc-badge loc-da">峴港</span></td>
+  <td><span class="cat-badge cat-buffet">🦞 吃到飽</span></td>
+  <td class="hours">約 11:30–14:30 / 17:30–21:30</td>
+  <td class="book-yes">強烈建議</td>
+  <td class="note-cell">龍蝦吃到飽，含多種海鮮，需提前訂位</td>
+</tr>
+```
+
+  </tbody>
+</table>
+</div>
+
+<div class="legend">
+  <span><span class="loc-badge loc-da">峴港</span></span>
+  <span><span class="loc-badge loc-hoi">會安</span></span>
+  <span>🔴 需/建議訂位</span>
+  <span>🟢 不需訂位</span>
+  <span>⭐ 米其林/必比登</span>
+</div>
+
+<button class="copy-btn" onclick="copyTable()">📋 複製表格文字</button>
+
+<script>
+  const buttons = document.querySelectorAll('.filter-btn');
+  const rows = document.querySelectorAll('#main-table tbody tr');
+  const countLabel = document.getElementById('count-label');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      let count = 0;
+      rows.forEach(row => {
+        let show = false;
+        if (f === 'all') show = true;
+        else if (f === 'da') show = row.dataset.loc === 'da';
+        else if (f === 'hoi') show = row.dataset.loc === 'hoi';
+        else if (f === 'michelin') show = row.dataset.michelin === '1';
+        else show = row.dataset.cat === f;
+        row.classList.toggle('hidden', !show);
+        if (show) count++;
+      });
+      countLabel.textContent = `顯示 ${count} 筆`;
+    });
+  });
+
+  function copyTable() {
+    const visibleRows = [...rows].filter(r => !r.classList.contains('hidden'));
+    let text = ['#\t餐廳名稱\t地區\t類別\t營業時間\t訂位\t備註'].join('') + '\n';
+    visibleRows.forEach(r => {
+      const cells = r.querySelectorAll('td');
+      text += [...cells].map(c => c.innerText.replace(/\n/g, ' ').trim()).join('\t') + '\n';
+    });
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ 已複製！';
+      setTimeout(() => btn.textContent = '📋 複製表格文字', 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
